@@ -8,26 +8,57 @@ describe Api::V1::ProductsController do
     end
 
     it "return the information of a reporter on a hash" do
-      product_response = json_response
+      product_response = json_response[:product]
       expect(product_response[:title]).to eql @product.title
+    end
+
+    it "has the user as a embeded object" do
+      product_response = json_response[:product]
+      expect(product_response[:user][:email]).to eql @product.user.email
     end
 
     it { should respond_with 200}
 	end
 
   describe "GET #index" do
-    before(:each) do
+
+    context "when is not receiving any products_ids paramater" do
+      before(:each) do
       @product_count = 10
       @products = @product_count.times{FactoryGirl.create :product}
       get :index
+      end
+
+      it "return the information of all the products" do
+        products_reponse = json_response
+        expect(products_reponse[:products].count).to eql @product_count
+      end
+
+      it "returns the user object into each product" do
+          products_response = json_response[:products]
+          products_response.each do |product_response|
+            expect(product_response[:user]).to be_present
+          end
+      end
+
+      it {should respond_with 200}
     end
 
-    it "return the information of all the products" do
-      products_reponse = json_response
-      expect(products_reponse[:products].count).to eql @product_count
-    end
+    context "when product_ids parameter is sent" do
+      before(:each) do
+        @user = FactoryGirl.create :user
+        3.times { FactoryGirl.create :product, user: @user }
+        get :index, product_ids: @user.product_ids
+      end
 
-    it {should respond_with 200}
+      it "returns just the products that belong to the user" do
+        products_response = json_response[:products]
+        products_response.each do |product_response|
+          expect(product_response[:user][:email]).to eql @user.email
+        end
+      end
+    end
+    
   end
 
   describe "POST #create" do
@@ -40,7 +71,7 @@ describe Api::V1::ProductsController do
       end
 
       it "renders the json representation for the product record just created" do
-        product_response = json_response
+        product_response = json_response[:product]
         expect(product_response[:title]).to eql @product_attributes[:title]
       end
 
@@ -83,7 +114,7 @@ describe Api::V1::ProductsController do
       end
 
       it "renders the json representation for the updated user" do
-        product_response = json_response
+        product_response = json_response[:product]
         expect(product_response[:title]).to eql "An expensive TV"
       end
 
