@@ -54,6 +54,7 @@ describe Api::V1::UsersController do
   describe "PUT/PATCH #update" do
     before(:each) do
       @user = FactoryGirl.create :user
+      request.headers['Authorization'] =  @user.auth_token
     end
 
     context "when is successfully updated" do
@@ -91,6 +92,7 @@ describe Api::V1::UsersController do
   describe "DELETE #destroy" do
     before(:each) do
       @user = FactoryGirl.create :user
+      api_authorization_header @user.auth_token #we added this line
       delete :destroy, { id: @user.id }
     end
 
