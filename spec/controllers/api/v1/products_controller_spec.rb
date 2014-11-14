@@ -12,11 +12,6 @@ describe Api::V1::ProductsController do
       expect(product_response[:title]).to eql @product.title
     end
 
-    it "has the user as a embeded object" do
-      product_response = json_response[:product]
-      expect(product_response[:user][:email]).to eql @product.user.email
-    end
-
     it { should respond_with 200}
 	end
 
@@ -34,31 +29,9 @@ describe Api::V1::ProductsController do
         expect(products_reponse[:products].count).to eql @product_count
       end
 
-      it "returns the user object into each product" do
-          products_response = json_response[:products]
-          products_response.each do |product_response|
-            expect(product_response[:user]).to be_present
-          end
-      end
-
       it {should respond_with 200}
     end
 
-    context "when product_ids parameter is sent" do
-      before(:each) do
-        @user = FactoryGirl.create :user
-        3.times { FactoryGirl.create :product, user: @user }
-        get :index, product_ids: @user.product_ids
-      end
-
-      it "returns just the products that belong to the user" do
-        products_response = json_response[:products]
-        products_response.each do |product_response|
-          expect(product_response[:user][:email]).to eql @user.email
-        end
-      end
-    end
-    
   end
 
   describe "POST #create" do
@@ -103,13 +76,13 @@ describe Api::V1::ProductsController do
   describe "PUT/PATCH #update" do
     before(:each) do
       @user = FactoryGirl.create :user
-      @product = FactoryGirl.create :product, user: @user
+      @product = FactoryGirl.create :product
       api_authorization_header @user.auth_token
     end
 
     context "when is successfully updated" do
       before(:each) do
-        patch :update, { user_id: @user.id, id: @product.id,
+        patch :update, { id: @product.id,
               product: { title: "An expensive TV" } }
       end
 
@@ -123,7 +96,7 @@ describe Api::V1::ProductsController do
 
     context "when is not updated" do
       before(:each) do
-        patch :update, { user_id: @user.id, id: @product.id,
+        patch :update, {id: @product.id,
               product: { price: "two hundred" } }
       end
 
@@ -144,7 +117,7 @@ describe Api::V1::ProductsController do
   describe "DELETE #destroy" do
     before(:each) do
       @user = FactoryGirl.create :user
-      @product = FactoryGirl.create :product, user: @user
+      @product = FactoryGirl.create :product
       api_authorization_header @user.auth_token
       delete :destroy, {id: @product.id }
     end
