@@ -38,7 +38,6 @@ describe Api::V1::SessionsController do
 
 
   describe "DELETE #destroy" do
-
     before(:each) do
       @user = FactoryGirl.create :user
       api_authorization_header @user.auth_token

@@ -9,8 +9,6 @@ describe User do
   it { should respond_to(:password) }
   it { should respond_to(:password_confirmation) }
 
-  it { should have_many(:products) }
-
   it { should be_valid }
 
   it { should validate_presence_of(:email) }
