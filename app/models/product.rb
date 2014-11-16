@@ -7,6 +7,8 @@ class Product < ActiveRecord::Base
   has_many :placements
   has_many :orders, through: :placements
 
+  validates :image_url, allow_blank: true, format: { with: %r{\.(gif|jpg|png)\Z}i, message: 'must be a URL for GIF, JPG or PNG image.' } 
+
   scope :filter_by_title, lambda { |keyword|
     where("lower(title) like?", "%#{keyword.downcase}")
   }

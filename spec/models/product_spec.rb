@@ -14,9 +14,32 @@ describe Product do
   it { should validate_presence_of :title }
   it { should validate_presence_of :price }
   it { should validate_numericality_of(:price).is_greater_than_or_equal_to(0) }
+  it { should_not validate_presence_of :image_url }
 
   it { should have_many(:placements) }
   it { should have_many(:orders).through(:placements) }
+
+  describe "image_url format" do
+    before(:each) do
+      @product = FactoryGirl.create :product
+    end
+
+    it "return be valid" do
+      ok = %w{ fred.gif fred.jpg fred.png FRED.JPG FRED.Jpg http://a.b.c/x/y/z/fred.gif }
+      ok.each do |name|
+        @product.image_url = name
+        expect(@product).to be_valid
+      end
+    end
+
+    it "return be unvalid" do
+      bad = %w{ fred.doc fred.gif/more fred.gif.more } 
+      bad.each do |name|
+        @product.image_url = name
+        @product.should be_invalid
+      end
+    end
+  end
 
   describe ".filter_by_title" do
     before(:each) do
