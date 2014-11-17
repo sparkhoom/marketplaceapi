@@ -34,6 +34,11 @@ class Api::V1::ProductsController < ApplicationController
     head 204
   end
 
+  def showproductimage
+    @product = Product.first
+    p @product.image_url
+  end
+
   private
 
   def product_params

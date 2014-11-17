@@ -1,6 +1,7 @@
 require 'api_constraints'
 
 MarketPlaceApi::Application.routes.draw do
+  get "store/index"
   mount SabisuRails::Engine => "/sabisu_rails"
   devise_for :users
   # Api definition
